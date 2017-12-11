@@ -1,0 +1,19 @@
+{
+  "name": "spotifier",
+  "version": "1.0.0",
+  "description": "App that expands Spotify API to add features like rating, sorting songs by country, etc.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "*",
+    "cookie-parser": "^1.4.3",
+    "express": "*",
+    "mongoose": "*",
+    "querystring": "^0.2.0",
+    "request": "^2.83.0"
+  },
+  "author": "Mantvydas Zakarevičius",
+  "license": "ISC"
+}
