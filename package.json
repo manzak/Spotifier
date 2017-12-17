@@ -1,6 +1,7 @@
 {
   "name": "spotifier",
   "version": "1.0.0",
+  "private": true,
   "description": "App that expands Spotify API to add features like rating, sorting songs by country, etc.",
   "main": "app.js",
   "scripts": {
@@ -10,10 +11,15 @@
     "body-parser": "*",
     "cookie-parser": "^1.4.3",
     "express": "*",
+    "express-session": "^1.15.6",
     "mongoose": "*",
     "querystring": "^0.2.0",
     "request": "^2.83.0"
   },
   "author": "Mantvydas Zakarevičius",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/manzak/Spotifier.git"
+  }
 }

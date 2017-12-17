@@ -12,6 +12,12 @@ var request = require('request'); // "Request" library
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
+// Parser for requests
+var bodyParser = require('body-parser');
+
+// With session middleware
+// var session = require('express-session');
+
 var client_id = '0adb20d41c9540acb1ba0985e7274c21'; // Your client id
 var client_secret = '13321b49a8894025aea91f52f8470a0f'; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
@@ -34,14 +40,44 @@ var generateRandomString = function(length) {
 var stateKey = 'spotify_auth_state';
 
 var app = express();
-
 app.use(express.static(__dirname + '/public'))
-   .use(cookieParser());
+  .use(cookieParser())
+  .use(bodyParser.json());
+
+// Connect to Mongoose
+var mongoose = require("mongoose");
+var spotifierDatabase = mongoose.connect("mongodb://localhost/spotifier", {
+  useMongoClient: true,
+  // Other options
+});
+
+// Importing used modules
+User = require("../models/user");
+
+// // Use the session middleware
+// app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 60000 }}))
+
+// // Access the session as req.session
+// app.get('/', function(req, res, next) {
+//  if (req.session.views) {
+//    req.session.views++
+//    res.setHeader('Content-Type', 'text/html')
+//    res.write('<p>views: ' + req.session.views + '</p>')
+//    res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>')
+//    res.end()
+//  } else {
+//    req.session.views = 1
+//    res.end('welcome to the session demo. refresh!')
+//    //console.log("sessionnn");
+//  }
+// })
 
 app.get('/login', function(req, res) {
 
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
+
+  console.log("/login path...");
 
   // your application requests authorization
   var scope = 'user-read-private user-read-email';
@@ -59,6 +95,8 @@ app.get('/callback', function(req, res) {
 
   // your application requests refresh and access tokens
   // after checking the state parameter
+
+  console.log("redirected to /callback...");
 
   var code = req.query.code || null;
   var state = req.query.state || null;
@@ -98,7 +136,22 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          console.log(body);
+          // console.log(body);
+
+          // Create user
+          // app.post("/users", function(req, res){
+            var user = body;
+            console.log("post /users");
+            User.addUser(user, access_token, refresh_token, function(err, user){
+                res.setHeader("Content-Type", "application/json");
+                if(err){
+                    res.status(500).send(JSON.stringify(err, null, 3));
+                } else {
+                    res.status(201).send(JSON.stringify(user, null, 3));
+                }
+            })
+          // });
+
         });
 
         // we can also pass the token to the browser to make requests from there

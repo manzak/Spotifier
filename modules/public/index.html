@@ -2,79 +2,87 @@
 <html lang="en">
 
   <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Spotifier - start rating music now!</title>
-
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Custom styles for this template -->
     <link href="css/heroic-features.css" rel="stylesheet">
-
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Handlebars-template scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   </head>
 
   <body>
-
-  <!-- Wrap all page content here -->
-  <div id="wrap">
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="#">Spotifier</a>
-        <!-- Only logged in user sees navigation menu -->
-        <div class="loggedin">
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="#">HOME
-                  <span class="sr-only">(current)</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" id="logout">LOG OUT</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Page Content -->
-    <div class="container">
-
-      <!-- Jumbotron Header -->
-      <header class="jumbotron my-4">
+    <!-- Wrap all page content here -->
+    <div id="wrap">
+      <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <!-- Login page -->
-          <div class="login" id="welcome_message">
-            <h1 class="display-3">Welcome to Spotifier!</h1>
-            <p class="lead">Get the right music, right now. Listen to millions of songs and rate them all!</p>
-            <a href="/login" class="btn btn-primary btn-lg">LOG IN WITH SPOTIFY</a>
-          </div>
-          <!-- Logged in user page -->
+          <a class="navbar-brand" href="#">Spotifier</a>
+          <!-- Only logged in user sees navigation menu -->
           <div class="loggedin">
-            <div id="user-profile">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" style="margin: 0; padding: 0; border: 0">
+              <!-- NOT USED - DEFAULT ICON FOR MENU BUTTON -->
+              <!-- <span class="navbar-toggler-icon"></span> -->
+              <div class="loggedin">
+                  <div id="user-navbar-icon">
+                  </div>
+              </div>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+              <ul class="navbar-nav ml-auto">
+                  <!-- user-navbar-name script data placeholder -->
+                  <div class="loggedin">
+                      <div id="user-navbar-name">
+                      </div>
+                  </div>
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">HOME
+                    <span class="sr-only">(current)</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#" id="logout">LOG OUT</a>
+                </li>
+              </ul>
             </div>
-            <div id="oauth">
-            </div>
-            <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
           </div>
         </div>
-      </header>
+      </nav>
+      <!-- /.navigation -->
+
+      <!-- Page Content -->
+      <div class="container">
+        <!-- Jumbotron Header -->
+        <header class="jumbotron my-4">
+          <div class="container">
+            <!-- Login page -->
+            <div class="login" id="welcome_message">
+              <h1 class="display-3">Welcome to Spotifier!</h1>
+              <p class="lead">Get the right music, right now. Listen to millions of songs and rate them all!</p>
+              <a href="/login" class="btn btn-primary btn-lg">LOG IN WITH SPOTIFY</a>
+            </div>
+            <!-- Logged in user page -->
+            <div class="loggedin">
+              <div id="user-profile">
+              </div>
+              <div id="oauth">
+              </div>
+              <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+            </div>
+          </div>
+        </header>
+      </div>
+      <!-- /.container -->
 
     </div>
-    <!-- /.container -->
-
-  </div>
 
     <!-- Footer visible only in landing page -->
     <div class="login ">
@@ -87,11 +95,39 @@
       </footer>
     </div>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- user-navbar-icon script (show user icon in navigation bar) -->
+    <script id="user-navbar-icon-template" type="text/x-handlebars-template">
+      <div class="loggedin">
+        <div>
+          {{#if display_name}}
+            <img class="media-object" width="48" height="48" src="{{images.0.url}}" />
+          {{else}}
+            <svg width="48" height="48" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+              <title>User Icon</title>
+              <path d="M67.74 61.78l-14.5-8.334c-.735-.422-1.24-1.145-1.385-1.98-.145-.835.088-1.685.638-2.33l5.912-6.93c3.747-4.378 5.81-9.967 5.81-15.737v-2.256c0-6.668-2.792-13.108-7.658-17.67C51.622 1.92 45.17-.386 38.392.054c-12.677.82-22.607 11.772-22.607 24.934v1.483c0 5.77 2.063 11.36 5.81 15.736l5.912 6.933c.55.644.783 1.493.638 2.33-.143.834-.648 1.556-1.383 1.98l-14.494 8.33C4.7 66.077 0 74.15 0 82.844v6.76h3.333v-6.76c0-7.5 4.055-14.46 10.59-18.174l14.5-8.334c1.597-.918 2.692-2.487 3.007-4.302.315-1.815-.19-3.66-1.387-5.06l-5.913-6.936c-3.23-3.775-5.01-8.594-5.01-13.57v-1.484c0-11.41 8.562-20.9 19.488-21.608 5.85-.377 11.415 1.61 15.67 5.598 4.26 3.992 6.605 9.404 6.605 15.24v2.254c0 4.976-1.778 9.796-5.01 13.57l-5.915 6.935c-1.195 1.4-1.7 3.246-1.386 5.06.313 1.816 1.41 3.385 3.008 4.303l14.507 8.338c6.525 3.71 10.58 10.67 10.58 18.17v6.76H80v-6.76c0-8.695-4.7-16.768-12.26-21.063z" fill="currentColor" fill-rule="evenodd"></path>
+            </svg>
+          {{/if}}
+        </div>
+      </div>
+    </script>
+
+    <!-- user-navbar-name script (show user name in navigation bar) -->
+    <script id="user-navbar-name-template" type="text/x-handlebars-template">
+      <div class="loggedin">
+        <div>
+          <li class="nav-item">
+              {{#if display_name}}
+                <span class="navbar-text">{{display_name}}</span>
+              {{else}}
+                <span class="navbar-text">{{id}}</span>
+              {{/if}}
+          </li>
+        </div>
+      </div>
+    </script>
 
     <!-- OAuth2 scripts -->
+    <!-- user-profile script (shows Spotify user information in body content) -->
     <script id="user-profile-template" type="text/x-handlebars-template">
       <h1>Logged in as {{display_name}}</h1>
       <div class="media">
@@ -111,7 +147,7 @@
         </div>
       </div>
     </script>
-
+    <!-- user-profile script (shows token Spotify user token information) -->
     <script id="oauth-template" type="text/x-handlebars-template">
       <h2>oAuth info</h2>
       <dl class="dl-horizontal">
@@ -120,11 +156,29 @@
       </dl>
     </script>
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <!-- Creates handlebars-template objects -->
+    <script>
+      // user-navbar-icon-template
+      var userNavbarIconSource = document.getElementById('user-navbar-icon-template').innerHTML,
+          userNavbarIconTemplate = Handlebars.compile(userNavbarIconSource),
+          userNavbarIconPlaceholder = document.getElementById('user-navbar-icon');
+      // user-navbar-name-template
+      var userNavbarNameSource = document.getElementById('user-navbar-name-template').innerHTML,
+          userNavbarNameTemplate = Handlebars.compile(userNavbarNameSource),
+          userNavbarNamePlaceholder = document.getElementById('user-navbar-name');
+      // user-profile-template
+      var userProfileSource = document.getElementById('user-profile-template').innerHTML,
+          userProfileTemplate = Handlebars.compile(userProfileSource),
+          userProfilePlaceholder = document.getElementById('user-profile');
+      // user-oauth-template
+      var oauthSource = document.getElementById('oauth-template').innerHTML,
+          oauthTemplate = Handlebars.compile(oauthSource),
+          oauthPlaceholder = document.getElementById('oauth');
+    </script>
+
+    <!-- Main script - creates handlebars templates and uses them -->
     <script>
       (function() {
-
         /**
          * Obtains parameters from the hash of the URL
          * @return Object
@@ -133,54 +187,56 @@
           var hashParams = {};
           var e, r = /([^&;=]+)=?([^&;]*)/g,
               q = window.location.hash.substring(1);
-          while ( e = r.exec(q)) {
+          while (e = r.exec(q)) {
               hashParams[e[1]] = decodeURIComponent(e[2]);
           }
           return hashParams;
         }
-
-        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-            userProfileTemplate = Handlebars.compile(userProfileSource),
-            userProfilePlaceholder = document.getElementById('user-profile');
-
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth');
-
+        // Hash parameters
         var params = getHashParams();
-
+        // Access token parameters
         var access_token = params.access_token,
             refresh_token = params.refresh_token,
             error = params.error;
 
+        // Checks if any errors were caught in decoded URI (if no error continues: else part)
         if (error) {
           alert('There was an error during the authentication');
         } else {
+          // Checks authentication (if no error continues, else renders not loggedin user screen)
           if (access_token) {
-            // render oauth info
+            // Render oauth info
             oauthPlaceholder.innerHTML = oauthTemplate({
               access_token: access_token,
               refresh_token: refresh_token
             });
 
+            // Request to api.spotify.com/v1/me
             $.ajax({
                 url: 'https://api.spotify.com/v1/me',
                 headers: {
                   'Authorization': 'Bearer ' + access_token
                 },
                 success: function(response) {
+                  // user-navbar-icon placeholder
+                  userNavbarIconPlaceholder.innerHTML = userNavbarIconTemplate(response);
+                  // user-navbar-name placeholder
+                  userNavbarNamePlaceholder.innerHTML = userNavbarNameTemplate(response);
+                  // user-profile placeholder
                   userProfilePlaceholder.innerHTML = userProfileTemplate(response);
 
+                  // Render loggedin screen
                   $('.login').hide();
                   $('.loggedin').show();
                 }
             });
           } else {
-              // render initial screen
+              // Render initial screen
               $('.login').show();
               $('.loggedin').hide();
           }
 
+          // Listener for obtain-new-token button
           document.getElementById('obtain-new-token').addEventListener('click', function() {
             $.ajax({
               url: '/refresh_token',
@@ -197,14 +253,13 @@
           }, false);
 
           // Logout [NOT GOOD, SHOULD LOG OUT ONLY FROM THIS APP]
+          // Listener for logout button
           document.getElementById('logout').addEventListener('click', function() {
             location.href = "https://www.spotify.com/logout/";
           }, false);
-
         }
       })();
     </script>
-
   </body>
 
 </html>
