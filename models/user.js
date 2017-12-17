@@ -4,7 +4,7 @@
 * Author : Mantvydas Zakarevičius
 * Name : Spotifier
 *
-* State : L2
+* State : L2-L3
 */
 
 // Imports
@@ -43,10 +43,12 @@ var User = module.exports = mongoose.model("users", userSchema);
 * Adds new user from formatted JSON.
 *
 * user - formatted user JSON to add to database.
+* access_token - access_token.
+* refresh_token - refresh_token.
+* session_id - session_id.
 * return - JSON formatted new user with all fields.
 */
-module.exports.addUser = function(user, access_token, refresh_token, session_id, callback){
-    console.log("ADD USER!\n", user);
+module.exports.addUser = function(user, access_token, refresh_token, session_id, callback) {
     User.findOneAndUpdate(
         { user_id: user.id },
         { user_id: user.id, session_id: session_id, access_token: access_token, refresh_token: refresh_token, create_date: Date.now() },
@@ -55,7 +57,14 @@ module.exports.addUser = function(user, access_token, refresh_token, session_id,
     );
 }
 
-// Get User
-module.exports.getUserById = function(id, callback){
-    User.findOne({session_id: id}, callback);
+/* 
+* GET User.
+* 
+* Gets new user by session_id (for session validation).
+*
+* session_id - session_id.
+* return - JSON formatted new user with all fields.
+*/
+module.exports.getUserById = function(session_id, callback) {
+    User.findOne({session_id: session_id}, callback);
 }

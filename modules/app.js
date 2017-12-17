@@ -18,19 +18,17 @@
 *   For more information, read
 *   https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
 *
-* State : L2
+* State : L2-L3
 */
 
 // NodeJS modules imports
 var express = require('express'); // Express web server framework
+var session = require('express-session'); // Express session module
 var request = require('request'); // Request library
 var querystring = require('querystring'); // QueryString from URL parser
 var cookieParser = require('cookie-parser'); // CookieParser module for parsing cookies data
 var bodyParser = require('body-parser'); // BodyParser for requests
 var morgan = require('morgan'); // Requests debugging
-
-var session = require('express-session');
-
 
 /* 
 * Spotify dashboard API connection data (PRIVATE ONLY FOR BACK-END)
@@ -57,9 +55,12 @@ var generateRandomString = function(length) {
 };
 
 // Starts Express
-var app = express().use(express.static(__dirname + '/public')).use(cookieParser()).use(bodyParser.json()).use(morgan('dev'));
-
-app.use(session({secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+var app = express()
+        .use(express.static(__dirname + '/public'))
+        .use(cookieParser())
+        .use(bodyParser.json())
+        .use(morgan('dev'))
+        .use(session({secret: client_id, resave: false, saveUninitialized: true}));
 
 // Connects to Mongoose
 var mongoose = require("mongoose");
@@ -70,28 +71,46 @@ var spotifierDatabase = mongoose.connect("mongodb://localhost/spotifier", {
 
 // Importing models used from models folder
 User = require("../models/user");
+Genre = require("../models/genre");
 
-// API login call
-app.get('/login', function(req, res) {
-  if (req.session == User.getUserById(req.session.id, function(err, user){
-    // res.setHeader("Content-Type", "application/json");
-    if(err){
-      console.log("error getting session id");
-        // res.status(500).send(JSON.stringify(err, null, 3));
-    } else {
-      console.log("session_id: ", user);
-        // res.status(201).send(JSON.stringify(user, null, 3));
-    }
-})) {
-    return res.redirect('/landing');
-    // res.send("logout success!");
+/* 
+* API.
+* 
+* Shows basic API information.
+*/
+app.get('/api', function(req, res) {
+  res.send("This is Spotifier API." + (req.session.access_token ? req.session.access_token : "Your not logged in to Spotify API!"));
+});
+
+/* 
+* API/GENRES.
+* 
+* Shows genres list.
+*/
+app.get("/api/genres", function(req, res){
+  if (req.session.access_token) {
+    Genre.getGenres(function(err, genres){
+      res.setHeader("Content-Type", "application/json");
+      if(err){
+          res.status(500).send(JSON.stringify(err, null, 3));
+      } else {
+          res.status(200).send(JSON.stringify(genres, null, 3));
+      }
+    })
+  } else {
+    res.status(403).send({error: {status: 404, message: "Invalid token. Access denied!"}});
   }
+});
 
+/* 
+* LOGIN app.
+* 
+* Logins user to app and creates user if it's new user.
+*/
+app.get('/login', function(req, res) {
   // Cookie data (state)
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
-
-  console.log("/login path...");
 
   // API requests authorization
   var scope = 'user-read-private user-read-email';
@@ -105,14 +124,13 @@ app.get('/login', function(req, res) {
     }));
 });
 
-
-// // API callback call
+/* 
+* CALLBACK app.
+* 
+* Callback to (localhost:8888/callback).
+*/
 app.get('/callback', function(req, res) {
-  // API requests refresh and access tokens
-  // after checking the state parameter
-
-  console.log("redirected to /callback...");
-
+  // API requests refresh and access tokens (after checking the state parameter)
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
@@ -145,44 +163,28 @@ app.get('/callback', function(req, res) {
     // API requests authorization
     request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
-
+        // Authorization parameters
         var access_token = body.access_token,
             refresh_token = body.refresh_token;
-
         var options = {
           url: 'https://api.spotify.com/v1/me',
           headers: { 'Authorization': 'Bearer ' + access_token },
           json: true
         };
 
-        // use the access token to access the Spotify Web API
+        // Use the access token to access the Spotify Web API (https://api.spotify.com/v1/me)
         request.get(options, function(error, response, body) {
-          // console.log(body);
-          
-          // Create user
-          // app.post("/users", function(req, res){
-            // TEMP FOR LOGOUT TESTING ------------------------
-            var user = body;
-            console.log("post /users");
-            User.addUser(user, access_token, refresh_token, req.session.id, function(err, user){
-                // res.setHeader("Content-Type", "application/json");
-                // if(err){
-                //     res.status(500).send(JSON.stringify(err, null, 3));
-                // } else {
-                //     res.status(201).send(JSON.stringify(user, null, 3));
-                // }
-            })
-            // TEMP FOR LOGOUT TESTING ------------------------
-          // });
-
+          User.addUser(body, access_token, refresh_token, req.session.id, function(err, user){
+            console.log("User has been modified!");
+          });
         });
 
-        // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' +
-          querystring.stringify({
-            access_token: access_token,
-            refresh_token: refresh_token
-          }));
+        // Sets cookies and redirect to main menu
+        req.session.access_token = access_token;
+        req.session.refresh_token = refresh_token;
+        res.cookie('access_token', req.session.access_token);
+        res.cookie('refresh_token', req.session.refresh_token);
+        res.redirect('/');
       } else {
         res.redirect('/#' +
           querystring.stringify({
@@ -193,169 +195,24 @@ app.get('/callback', function(req, res) {
   }
 });
 
-// API refresh_token call
-app.get('/refresh_token', function(req, res) {
-  var refresh_token = req.query.refresh_token;
-  var authOptions = {
-    url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
-    form: {
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token
-    },
-    json: true
-  };
-
-  // Requesting access token from refresh token
-  request.post(authOptions, function(error, response, body) {
-    if (!error && response.statusCode === 200) {
-      var access_token = body.access_token;
-      res.send({
-        'access_token': access_token
-      });
-    }
-  });
-});
-
-// API browse call
-// app.get('/', function(req, res) {
-//   // res.clearCookie(stateKey);
-//   console.log("redirected to /...");
-  
-//   var code = req.query.code || null;
-//   var state = req.query.state || null;
-//   var storedState = req.cookies ? req.cookies[stateKey] : null;
-
-//   // If there was an error getting state key cookie (stateKey) (redirect to localhost:8888/# with an error message)
-//   if (state === null || state !== storedState) {
-//     res.redirect('/#' +
-//       querystring.stringify({
-//         error: 'state_mismatch'
-//       }));
-//   // If state key cookie was found (clear cookie and ask for a new one)
-//   } else {
-//     console.log("redirected to callback aka /browse...");
-//     res.redirect('/callback');
-//   }
-// });
-
-// app.get('/', function (req, res) {
-//   res.render('index', {});
-// });
-
-// API logout call
-// app.get('/logout', function(req, res) {
-//   // res.clearCookie(stateKey);
-//   // console.log("redirected to /logout...");
-  
-//   // var code = req.query.code || null;
-//   // var state = req.query.state || null;
-//   // var storedState = req.cookies ? req.cookies[stateKey] : null;
-
-//   // // If there was an error getting state key cookie (stateKey) (redirect to localhost:8888/# with an error message)
-//   // if (state === null || state !== storedState) {
-//   //   res.redirect('/#' +
-//   //     querystring.stringify({
-//   //       error: 'state_mismatch'
-//   //     }));
-//   // // If state key cookie was found (clear cookie and ask for a new one)
-//   // } else {
-//   //   console.log("cookie was cleared...");
-//   //   // Clear cookie (stateKey)
-//   //   res.clearCookie(stateKey);
-//   //   res.redirect('/#');
-//   // }
-//   req.logout();
-//   res.redirect('/');
-// });
-
-// app.get('/logout', function(req, res){
-//   req.logout();
-//   res.redirect('/');
-// });
-
-// Authentication and Authorization Middleware
-var auth = function(req, res, next) {
-  if (req.session && req.session.id)
-    return next();
-  else
-    return res.sendStatus(401);
-};
-
-app.get('/logout',function(req, res){
-  // req.session.destroy(function(){
-  //   res.redirect('/');
-  // });
-    if (req.session) {
+/* 
+* LOGOUT app.
+* 
+* Logout user from current session and redirect to main page.
+*/
+app.get('/logout', function(req, res) {
+  if (req.session || req.session.access_token) {
+    console.log("Session has been destroyed.");
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
     req.session.destroy();
     res.redirect('/');
-    // res.send("logout success!");
   } else {
+    console.log("Session already has been destroyed!");
     res.redirect('/');
-    // res.send("Session already has been destroyed!");
   }
-}); 
-
-app.get('/test-function', auth, function (req, res) {
-      res.send("You can only see this after you've logged in.");
-  // console.log("test-function: ");
-
-  // console.log(req.sessionID);
 });
 
 // Listens to 8888 port on local server
 app.listen(8888);
-console.log('Listening on 8888');
-
-//[START] - ALL CODE WHICH IS FOR TESTING OR NOT YET IMPLEMENTED
-
-//[SESSION_MIDDLEWARE_START]----------------------------------------
-
-// SESSION CODE -------------------------------------------------------------------------
-// var session = require('express-session'); // SESSION
-
-// .use(session({
-//   secret: '2C44-4D44-WppQ38S',
-//   resave: true,
-//   saveUninitialized: true
-// }))
-
-// Authentication and Authorization Middleware
-// var auth = function(req, res, next) {
-//   if (req.session && req.session.user === "amy" && req.session.admin)
-//     return next();
-//   else
-//     return res.sendStatus(401);
-// };
- 
-// // Login endpoint
-// app.get('/login', function (req, res) {
-//   if (!req.query.username || !req.query.password) {
-//     res.send('login failed');    
-//   } else if(req.query.username === "amy" || req.query.password === "amyspassword") {
-//     req.session.user = "amy";
-//     req.session.admin = true;
-//     res.send("login success!");
-//   }
-// });
- 
-// // Logout endpoint
-// app.get('/logout', function (req, res) {
-//   if (req.session) {
-//     req.session.destroy();
-//     res.send("logout success!");
-//   } else {
-//     res.send("Session already has been destroyed!");
-//   }
-
-// });
- 
-// // Get content endpoint
-// app.get('/content', auth, function (req, res) {
-//     res.send("You can only see this after you've logged in.");
-// });
-// SESSION CODE -------------------------------------------------------------------------
-
-//[SESSION_MIDDLEWARE_START_END]----------------------------------------
-
-//[END]
+console.log('Listening on 8888...');

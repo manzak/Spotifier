@@ -51,7 +51,6 @@
                 <li class="nav-item">
                   <!-- OLD REDIRECT TO SPOTIFY LOGOUT METHOD -->
                   <!-- <a class="nav-link" href="#" id="logout">LOG OUT</a> -->
-
                   <a class="nav-link" href="/logout">LOG OUT</a> -->
                 </li>
               </ul>
@@ -74,17 +73,17 @@
             </div>
             <!-- Logged in user page -->
             <div class="loggedin">
-              <div id="user-profile">
-              </div>
-              <div id="oauth">
-              </div>
-              <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+              <!-- Logged in place holder -->
+              <h1 class="display-3">Welcome user to our Web Application!</h1>
+              <p class="lead">Spotifier let's you use those cool functions!</p>
+              <a href="/api/genres" class="btn btn-primary btn-lg">Rate songs</a>
+              <a href="/api/followers" class="btn btn-primary btn-lg">Rate followed artists</a>
+              <a href="/api/playlists" class="btn btn-primary btn-lg">Get playlists</a>
             </div>
           </div>
         </header>
       </div>
       <!-- /.container -->
-
     </div>
 
     <!-- Footer visible only in landing page -->
@@ -102,7 +101,7 @@
     <script id="user-navbar-icon-template" type="text/x-handlebars-template">
       <div class="loggedin">
         <div>
-          {{#if display_name}}
+          {{#if images}}
             <img class="media-object" width="48" height="48" src="{{images.0.url}}" />
           {{else}}
             <svg width="48" height="48" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
@@ -129,36 +128,6 @@
       </div>
     </script>
 
-    <!-- OAuth2 scripts -->
-    <!-- user-profile script (shows Spotify user information in body content) -->
-    <script id="user-profile-template" type="text/x-handlebars-template">
-      <h1>Logged in as {{display_name}}</h1>
-      <div class="media">
-        <div class="pull-left">
-          <img class="media-object" width="150" src="{{images.0.url}}" />
-        </div>
-        <div class="media-body">
-          <dl class="dl-horizontal">
-            <dt>Display name</dt><dd class="clearfix">{{display_name}}</dd>
-            <dt>Id</dt><dd>{{id}}</dd>
-            <dt>Email</dt><dd>{{email}}</dd>
-            <dt>Spotify URI</dt><dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
-            <dt>Link</dt><dd><a href="{{href}}">{{href}}</a></dd>
-            <dt>Profile Image</dt><dd class="clearfix"><a href="{{images.0.url}}">{{images.0.url}}</a></dd>
-            <dt>Country</dt><dd>{{country}}</dd>
-          </dl>
-        </div>
-      </div>
-    </script>
-    <!-- user-profile script (shows token Spotify user token information) -->
-    <script id="oauth-template" type="text/x-handlebars-template">
-      <h2>oAuth info</h2>
-      <dl class="dl-horizontal">
-        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}></dd>
-      </dl>
-    </script>
-
     <!-- Creates handlebars-template objects -->
     <script>
       // user-navbar-icon-template
@@ -169,99 +138,55 @@
       var userNavbarNameSource = document.getElementById('user-navbar-name-template').innerHTML,
           userNavbarNameTemplate = Handlebars.compile(userNavbarNameSource),
           userNavbarNamePlaceholder = document.getElementById('user-navbar-name');
-      // user-profile-template
-      var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-          userProfileTemplate = Handlebars.compile(userProfileSource),
-          userProfilePlaceholder = document.getElementById('user-profile');
-      // user-oauth-template
-      var oauthSource = document.getElementById('oauth-template').innerHTML,
-          oauthTemplate = Handlebars.compile(oauthSource),
-          oauthPlaceholder = document.getElementById('oauth');
     </script>
 
     <!-- Main script - creates handlebars templates and uses them -->
     <script>
       (function() {
         /**
-         * Obtains parameters from the hash of the URL
-         * @return Object
+         * Obtains cookie by it's name.
+         * @return Cookie data
          */
-        function getHashParams() {
-          var hashParams = {};
-          var e, r = /([^&;=]+)=?([^&;]*)/g,
-              q = window.location.hash.substring(1);
-          while (e = r.exec(q)) {
-              hashParams[e[1]] = decodeURIComponent(e[2]);
+        function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+              c = c.substring(1);
           }
-          return hashParams;
+          if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+          }
         }
-        // Hash parameters
-        var params = getHashParams();
-        // Access token parameters
-        var access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error;
+            return "";
+        }
 
-        // Checks if any errors were caught in decoded URI (if no error continues: else part)
-        if (error) {
-          alert('There was an error during the authentication');
-        } else {
-          // Checks authentication (if no error continues, else renders not loggedin user screen)
-          if (access_token) {
-            // Render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
+        // If user had been logged in (has access_token) perform user data request to Spotify
+        var access_token = getCookie("access_token");
+        if (access_token) {
+          // Request to api.spotify.com/v1/me
+          $.ajax({
+              url: 'https://api.spotify.com/v1/me',
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function(response) {
+                // user-navbar-icon placeholder
+                userNavbarIconPlaceholder.innerHTML = userNavbarIconTemplate(response);
+                // user-navbar-name placeholder
+                userNavbarNamePlaceholder.innerHTML = userNavbarNameTemplate(response);
 
-            // Request to api.spotify.com/v1/me
-            $.ajax({
-                url: 'https://api.spotify.com/v1/me',
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                success: function(response) {
-                  // user-navbar-icon placeholder
-                  userNavbarIconPlaceholder.innerHTML = userNavbarIconTemplate(response);
-                  // user-navbar-name placeholder
-                  userNavbarNamePlaceholder.innerHTML = userNavbarNameTemplate(response);
-                  // user-profile placeholder
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-
-                  // Render loggedin screen
-                  $('.login').hide();
-                  $('.loggedin').show();
-                }
-            });
-          } else {
-              // Render initial screen
-              $('.login').show();
-              $('.loggedin').hide();
-          }
-
-          // Listener for obtain-new-token button
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: {
-                'refresh_token': refresh_token
+                // Render loggedin screen
+                $('.login').hide();
+                $('.loggedin').show();
               }
-            }).done(function(data) {
-              access_token = data.access_token;
-              oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token: access_token,
-                refresh_token: refresh_token
-              });
-            });
-          }, false);
-
-          // Logout [NOT GOOD, SHOULD LOG OUT ONLY FROM THIS APP]
-
-          // OLD REDIRECT TO SPOTIFY LOGOUT METHOD
-          // Listener for logout button
-          // document.getElementById('logout').addEventListener('click', function() {
-          //   location.href = "https://www.spotify.com/logout/";
-          // }, false);
+          });
+        } else {
+            // Render initial screen
+            $('.login').show();
+            $('.loggedin').hide();
         }
       })();
     </script>
