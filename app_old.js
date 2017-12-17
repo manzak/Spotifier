@@ -35,7 +35,7 @@ var objectID = mongoose.Types.ObjectId;
 // Importing used modules
 Genre = require("./models/genre");
 Song = require("./models/song");
-SpotifyAuthorization = require("./modules/spotify_authorization");
+// SpotifyAuthorization = require("./modules/spotify_authorization");
 
 // Creating route
 app.get("/", function(req, res){

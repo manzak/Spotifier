@@ -49,7 +49,10 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#" id="logout">LOG OUT</a>
+                  <!-- OLD REDIRECT TO SPOTIFY LOGOUT METHOD -->
+                  <!-- <a class="nav-link" href="#" id="logout">LOG OUT</a> -->
+
+                  <a class="nav-link" href="/logout">LOG OUT</a> -->
                 </li>
               </ul>
             </div>
@@ -253,10 +256,12 @@
           }, false);
 
           // Logout [NOT GOOD, SHOULD LOG OUT ONLY FROM THIS APP]
+
+          // OLD REDIRECT TO SPOTIFY LOGOUT METHOD
           // Listener for logout button
-          document.getElementById('logout').addEventListener('click', function() {
-            location.href = "https://www.spotify.com/logout/";
-          }, false);
+          // document.getElementById('logout').addEventListener('click', function() {
+          //   location.href = "https://www.spotify.com/logout/";
+          // }, false);
         }
       })();
     </script>

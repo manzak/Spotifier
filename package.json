@@ -14,7 +14,8 @@
     "express-session": "^1.15.6",
     "mongoose": "*",
     "querystring": "^0.2.0",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "morgan": "*"
   },
   "author": "Mantvydas Zakarevičius",
   "license": "ISC",
