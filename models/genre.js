@@ -33,8 +33,19 @@ var Genre = module.exports = mongoose.model("genres", genreSchema);
 * limit - limits results amount.
 * return - JSON formatted genres list with all fields.
 */
-module.exports.getGenres = function(callback, limit){
-    Genre.find(callback).limit(limit);
+// module.exports.getGenres = function(callback, limit){
+//     Genre.find(callback).limit(limit);
+// }
+
+module.exports.getGenres = function(header_access_token, callback, limit){
+    console.log(header_access_token);
+    if (Genre.findById({access_token: header_access_token})) {
+        console.log("header_access_token valid: access granted.");
+        Genre.find(callback).limit(limit);
+    } else {
+        console.log("invalid token: access denied.");
+        return callback;
+    }
 }
 
 /* 

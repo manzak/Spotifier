@@ -74,35 +74,6 @@ User = require("../models/user");
 Genre = require("../models/genre");
 
 /* 
-* API.
-* 
-* Shows basic API information.
-*/
-app.get('/api', function(req, res) {
-  res.send("This is Spotifier API." + (req.session.access_token ? req.session.access_token : "Your not logged in to Spotify API!"));
-});
-
-/* 
-* API/GENRES.
-* 
-* Shows genres list.
-*/
-app.get("/api/genres", function(req, res){
-  if (req.session.access_token) {
-    Genre.getGenres(function(err, genres){
-      res.setHeader("Content-Type", "application/json");
-      if(err){
-          res.status(500).send(JSON.stringify(err, null, 3));
-      } else {
-          res.status(200).send(JSON.stringify(genres, null, 3));
-      }
-    })
-  } else {
-    res.status(403).send({error: {status: 404, message: "Invalid token. Access denied!"}});
-  }
-});
-
-/* 
 * LOGIN app.
 * 
 * Logins user to app and creates user if it's new user.
@@ -211,6 +182,98 @@ app.get('/logout', function(req, res) {
     console.log("Session already has been destroyed!");
     res.redirect('/');
   }
+});
+
+/* 
+* API.
+* 
+* Shows basic API information.
+*/
+app.get('/api', function(req, res) {
+  // if (req.cookies) {
+    if (req.session.access_token) {
+      res.status(200).send({status: 200, token: req.session.access_token});
+    } else {
+      res.status(403).send({error: {status: 403, message: "Invalid token. Access denied!"}});
+    }
+  // } else {
+  //   res.redirect('/login');
+  // }
+});
+
+/* 
+* Router middleware.
+* 
+* Checks authorization before granting API usage.
+*/
+// app.use(function(req, res, next) {
+//   if (!req.headers.authorization) {
+//     return res.status(403).json({ error: 'No credentials sent!' });
+//   } 
+//   // else if (req.headers.authorization != req.session.access_token) {
+//   //   return res.status(401).json({ error: 'Access denied!' });
+//   // }
+//     console.log(User.findById({access_token: req}));
+
+//   next();
+// });
+
+/* 
+* API/GENRES.
+* 
+* Shows genres list.
+*/
+app.get("/api/genres", function(req, res){
+  // if (req.session.access_token) {
+    Genre.getGenres(req.session.access_token, function(err, genres){
+      res.setHeader("Content-Type", "application/json");
+      if(err){
+          res.status(500).send(JSON.stringify(err, null, 3));
+      } else {
+          res.status(200).send(JSON.stringify(genres, null, 3));
+      }
+    })
+  // } else {
+  //   res.status(403).send({error: {status: 403, message: "Invalid token. Access denied!"}});
+  // }
+});
+
+/* 
+* API/USERS.
+* 
+* Deletes an user.
+*/
+app.delete("/api/users/:_id", function(req, res){
+  var id = req.params._id;
+  console.log(id);
+    User.deleteUser(id, function(err, user){
+        if(err){
+            res.status(500).send(JSON.stringify(err, null, 3));
+        } else if (user.deletedCount == 0) {
+            res.status(404).send({error: {status: 404, message: "Not found"}});
+        } else {
+            res.status(204).send();
+        }
+    });
+});
+
+/* 
+* API/USERS.
+* 
+* Gets an user.
+*/
+app.get("/api/users/:_id", function(req, res){
+  var id = req.params._id;
+  User.getUserById(id, function(err, user){
+    res.setHeader("Content-Type", "application/json");
+    if(err){
+        res.status(500).send(JSON.stringify(err, null, 3));
+    } else if (user == null) {
+        res.status(404).send({error: {status: 404, message: "Not found"}});
+    } else {
+        res.status(200).send(JSON.stringify(user, null, 3));
+    }
+  })
 });
 
 // Listens to 8888 port on local server

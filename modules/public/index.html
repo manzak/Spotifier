@@ -72,13 +72,14 @@
               <a href="/login" class="btn btn-primary btn-lg">LOG IN WITH SPOTIFY</a>
             </div>
             <!-- Logged in user page -->
-            <div class="loggedin">
+            <div class="loggedin">            
               <!-- Logged in place holder -->
               <h1 class="display-3">Welcome user to our Web Application!</h1>
               <p class="lead">Spotifier let's you use those cool functions!</p>
-              <a href="/api/genres" class="btn btn-primary btn-lg">Rate songs</a>
+              <a href="/api/genres" class="btn btn-primary btn-lg">Songs rating <!-- Counter placeholder --><span id="user-content-counter"></span></a>                              
               <a href="/api/followers" class="btn btn-primary btn-lg">Rate followed artists</a>
               <a href="/api/playlists" class="btn btn-primary btn-lg">Get playlists</a>
+              <a class="btn btn-primary btn-lg btn-warning" id="delete-user">DELETE USER</a>
             </div>
           </div>
         </header>
@@ -128,6 +129,9 @@
       </div>
     </script>
 
+    <!-- user-content-counter script (show user counter in navigation bar) -->
+    <script id="user-content-counter-template" type="text/x-handlebars-template">({{rated_elements_count}})</script>
+
     <!-- Creates handlebars-template objects -->
     <script>
       // user-navbar-icon-template
@@ -138,6 +142,10 @@
       var userNavbarNameSource = document.getElementById('user-navbar-name-template').innerHTML,
           userNavbarNameTemplate = Handlebars.compile(userNavbarNameSource),
           userNavbarNamePlaceholder = document.getElementById('user-navbar-name');
+      // user-content-counter-template
+      var userContentCounterSource = document.getElementById('user-content-counter-template').innerHTML,
+          userContentCounterTemplate = Handlebars.compile(userContentCounterSource),
+          userContentCounterPlaceholder = document.getElementById('user-content-counter');
     </script>
 
     <!-- Main script - creates handlebars templates and uses them -->
@@ -168,21 +176,45 @@
         if (access_token) {
           // Request to api.spotify.com/v1/me
           $.ajax({
-              url: 'https://api.spotify.com/v1/me',
-              headers: {
-                'Authorization': 'Bearer ' + access_token
-              },
-              success: function(response) {
-                // user-navbar-icon placeholder
-                userNavbarIconPlaceholder.innerHTML = userNavbarIconTemplate(response);
-                // user-navbar-name placeholder
-                userNavbarNamePlaceholder.innerHTML = userNavbarNameTemplate(response);
+            url: 'https://api.spotify.com/v1/me',
+            headers: {
+              'Authorization': 'Bearer ' + access_token
+            },
+            success: function(response) {
+              // user-navbar-icon placeholder
+              userNavbarIconPlaceholder.innerHTML = userNavbarIconTemplate(response);
+              // user-navbar-name placeholder
+              userNavbarNamePlaceholder.innerHTML = userNavbarNameTemplate(response);
 
-                // Render loggedin screen
-                $('.login').hide();
-                $('.loggedin').show();
-              }
+              // Get user information for counter
+              $.ajax({
+                url: '/api/users/' + access_token,
+                type: 'GET',
+                success: function(response) {
+                  // user-content-counter placeholder
+                  userContentCounterPlaceholder.innerHTML = userContentCounterTemplate(response);
+                  console.log(response);
+                }
+              });
+
+              // Render loggedin screen
+              $('.login').hide();
+              $('.loggedin').show();
+            }
           });
+
+          // Delete button listener
+          document.getElementById('delete-user').addEventListener('click', function() {
+            $.ajax({
+              url: '/api/users/' + access_token,
+              type: 'DELETE',
+              success: function(response) {
+                location.href = "/logout"
+                console.log("User deleted.");
+              }
+            });
+          }, false);
+
         } else {
             // Render initial screen
             $('.login').show();

@@ -29,6 +29,11 @@ var userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    rated_elements_count: {
+        type: Number,
+        default: 0,
+        required: true
+    },
     create_date: {
         type: Date,
         default: Date.now
@@ -51,20 +56,37 @@ var User = module.exports = mongoose.model("users", userSchema);
 module.exports.addUser = function(user, access_token, refresh_token, session_id, callback) {
     User.findOneAndUpdate(
         { user_id: user.id },
-        { user_id: user.id, session_id: session_id, access_token: access_token, refresh_token: refresh_token, create_date: Date.now() },
+        { user_id: user.id, session_id: session_id, access_token: access_token, refresh_token: refresh_token, rated_elements_count: 0, create_date: Date.now() },
         { upsert: true, new: true },
         callback
     );
 }
 
 /* 
-* GET User.
+* DELETE user.
 * 
-* Gets new user by session_id (for session validation).
+* Deletes existing user if found from formatted JSON by access_token.
 *
-* session_id - session_id.
-* return - JSON formatted new user with all fields.
+* return - returns deleted user object
 */
-module.exports.getUserById = function(session_id, callback) {
-    User.findOne({session_id: session_id}, callback);
+module.exports.deleteUser = function(access_token, callback){
+    User.deleteOne(
+        { access_token: access_token },
+        callback
+    );
+}
+
+/* 
+* GET user.
+* 
+* Gets existing user if found from formatted JSON by access_token.
+*
+* return - returns deleted user object
+*/
+module.exports.getUserById = function(access_token, callback){
+    console.log(access_token);
+    User.findOne(
+        { access_token: access_token },
+        callback
+    );
 }
