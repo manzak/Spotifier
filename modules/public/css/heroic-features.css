@@ -61,4 +61,7 @@ code {
   font-size: 80%;
 }
 
+table.songs-table tbody tr td:first-child{width: 5%}
+table.songs-table tbody tr td:last-child{width: 15%}
+
 /* max-width TO-DO */

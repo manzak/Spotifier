@@ -76,10 +76,13 @@
               <!-- Logged in place holder -->
               <h1 class="display-3">Welcome user to our Web Application!</h1>
               <p class="lead">Spotifier let's you use those cool functions!</p>
-              <a href="/api/genres" class="btn btn-primary btn-lg">Songs rating <!-- Counter placeholder --><span id="user-content-counter"></span></a>                              
-              <a href="/api/followers" class="btn btn-primary btn-lg">Rate followed artists</a>
-              <a href="/api/playlists" class="btn btn-primary btn-lg">Get playlists</a>
-              <a class="btn btn-primary btn-lg btn-warning" id="delete-user">DELETE USER</a>
+              <a href="#" class="btn btn-success btn-lg" id="rate-songs">Rate saved songs <!-- Counter placeholder --><span id="user-content-counter"></span></a>
+              <button href="/api/followers" class="btn btn-lg btn-warning" disabled>Rate followed artists</button>
+              <button href="/api/playlists" class="btn btn-lg btn-warning" disabled>Get playlists</button>
+              <a href="" class="btn btn-lg btn-danger" id="delete-user">DELETE USER</a>
+              <div class="rate-songs-content" style="display: none;">
+                <div id="user-rate-songs"></div>
+              </div>
             </div>
           </div>
         </header>
@@ -132,6 +135,43 @@
     <!-- user-content-counter script (show user counter in navigation bar) -->
     <script id="user-content-counter-template" type="text/x-handlebars-template">({{rated_elements_count}})</script>
 
+    <!-- user-rate-songs script (show user counter in navigation bar) -->
+    <script id="user-rate-songs-template" type="text/x-handlebars-template">
+      <table class="table table-hover table-striped songs-table" id="">
+        <thead>
+          <h3>Saved songs list</g3>
+        </thead>
+        <tbody>
+          {{#if items}}
+            {{#items}}
+              <tr>
+                <td><img width="64" height="64" src="{{track.album.images.2.url}}"/></td>
+                <td>{{track.name}}
+                  <span> - </span>
+                  <span>
+                    {{#track.artists}}
+                      {{name}}
+                    {{/track.artists}}
+                </span>
+                </td>
+                <td class="star-rating">
+                  <span class="badge btn-danger badge-default badge-pill" data-rating="1">1</span>
+                  <span class="badge btn-danger badge-default badge-pill" data-rating="2">2</span>
+                  <span class="badge btn-warning badge-default badge-pill" data-rating="3">3</span>
+                  <span class="badge btn-success badge-default badge-pill" data-rating="4">4</span>
+                  <span class="badge btn-success badge-default badge-pill" data-rating="5">5</span>
+                </td>
+              </tr>
+            {{/items}}
+          {{else}}
+            <span>
+                You haven't saved any song yet. Go ahead and make your playlist!
+            </span>
+          {{/if}}
+        </tbody>
+      </table>
+    </script>
+
     <!-- Creates handlebars-template objects -->
     <script>
       // user-navbar-icon-template
@@ -146,6 +186,10 @@
       var userContentCounterSource = document.getElementById('user-content-counter-template').innerHTML,
           userContentCounterTemplate = Handlebars.compile(userContentCounterSource),
           userContentCounterPlaceholder = document.getElementById('user-content-counter');
+      // user-content-counter-template
+      var userRateSongsSource = document.getElementById('user-rate-songs-template').innerHTML,
+          userRateSongsTemplate = Handlebars.compile(userRateSongsSource),
+          userRateSongsPlaceholder = document.getElementById('user-rate-songs');
     </script>
 
     <!-- Main script - creates handlebars templates and uses them -->
@@ -193,7 +237,6 @@
                 success: function(response) {
                   // user-content-counter placeholder
                   userContentCounterPlaceholder.innerHTML = userContentCounterTemplate(response);
-                  console.log(response);
                 }
               });
 
@@ -209,8 +252,26 @@
               url: '/api/users/' + access_token,
               type: 'DELETE',
               success: function(response) {
-                location.href = "/logout"
-                console.log("User deleted.");
+                location.href = "/logout";
+              }
+            });
+          }, false);
+
+          // Songs rating button listener
+          document.getElementById('rate-songs').addEventListener('click', function() {
+            console.log("button listener");
+            $.ajax({
+              url: 'https://api.spotify.com/v1/me/tracks?limit=50',
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function(response) {
+                // user-rate-songs placeholder
+                userRateSongsPlaceholder.innerHTML = userRateSongsTemplate(response);
+                // location.href = "/logout"
+                console.log(response);
+
+                $('.rate-songs-content').toggle();
               }
             });
           }, false);
@@ -220,6 +281,29 @@
             $('.login').show();
             $('.loggedin').hide();
         }
+
+
+        // Start rating function
+        var $star_rating = $('.star-rating .fa');
+
+        var SetRatingStar = function() {
+          return $star_rating.each(function() {
+            if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+              return $(this).removeClass('fa-star-o').addClass('fa-star');
+            } else {
+              return $(this).removeClass('fa-star').addClass('fa-star-o');
+            }
+          });
+        };
+
+        $star_rating.on('click', function() {
+          $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+          return SetRatingStar();
+        });
+
+        SetRatingStar();
+
+
       })();
     </script>
   </body>
