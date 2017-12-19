@@ -62,8 +62,8 @@ code {
 }
 
 /* Table formating */
-table.songs-table tbody tr td:first-child{width: 5%}
-table.songs-table tbody tr td:last-child{width: 15%}
+table.songs-rate-table tbody tr td:first-child{width: 5%}
+table.songs-rate-table tbody tr td:last-child{width: 15%}
 
 /* Star rating formating */
 .rating {

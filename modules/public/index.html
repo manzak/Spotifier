@@ -20,6 +20,27 @@
   </head>
 
   <body>
+  <!-- User information modal -->
+    <div class="modal fade" id="userInformation" tabindex="-1" role="dialog" aria-labelledby="userInformationModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title text-success" id="userInformationModalLabel">Account overview</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <!-- user-information placeholder -->
+            <div id="user-information"></div>
+          </div>
+          <div class="modal-footer">
+            <button href="" class="btn btn-md btn-danger mr-auto" id="delete-user">DELETE USER</button>
+            <button type="button" class="btn btn-info">EDIT PROFILE</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Wrap all page content here -->
     <div id="wrap">
       <!-- Navigation -->
@@ -36,11 +57,11 @@
               <!-- </div> -->
             </button>
 
-
             <div class="collapse navbar-collapse" id="navbarResponsive">
               <ul class="navbar-nav ml-auto">
                 <!-- user-navbar-name script data placeholder -->
-                <li class="nav-item navbar-text" id="user-navbar-name"></li>
+                <!-- trigger user information modal -->
+                <a href="" class="nav-item navbar-text" style="text-decoration: none" id="user-navbar-name" data-toggle="modal" data-target="#userInformation"></a>
                 <!-- <li class="nav-item">
                   <a class="nav-link" href="#">HOME
                     <span class="sr-only">(current)</span>
@@ -51,7 +72,6 @@
                 </li>
               </ul>
             </div>
-
 
           </div>
         </div>
@@ -71,8 +91,8 @@
             </div>
             <!-- Logged in user page -->
             <div class="loggedin">
-              <h1 class="display-4">Welcome user to our Web Application!</h1>
-              <p class="lead">Spotifier let's you use those cool functions!</p>
+              <h1 class="display-4">Welcome to our Web Application!</h1>
+              <p class="lead">Spotifier let's you expand default spotify functionality by allowing to rate songs, artists. Retrieving rankings of both songs and artists is available to you too!</p>
                 <div id="accordion" role="tablist">
                   <div class="card">
                     <button class="btn btn-lg btn-success text-left" role="tab" id="rate-songs" data-toggle="collapse" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -85,6 +105,8 @@
                     </button>
                     <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="rate-songs" data-parent="#accordion">
                       <div class="card-body">
+                        <!-- Search input -->
+                        <input class="form-control" id="songsRateTableInput" type="text" placeholder="Search songs..."><br>
                         <!-- Rate songs content placeholder -->
                         <div id="user-rate-songs"></div>
                       </div>
@@ -137,7 +159,7 @@
                 <!-- <button href="/api/followers" type="button" class="btn btn-md btn-warning" disabled>Rate followed artists</button>
                 <button href="/api/playlists" class="btn btn-md btn-warning" disabled>Songs rankings</button>
                 <button href="/api/songs" class="btn btn-md btn-warning" disabled>Followers rankings</button> -->
-                <button href="" class="btn btn-md btn-danger" id="delete-user">DELETE USER</button>
+                <!-- <button href="" class="btn btn-md btn-danger" id="delete-user">DELETE USER</button> -->
                 <!-- Toogleable Rate songs button placeholder -->
                 <!-- <div class="rate-songs-content" style="display: none;"> -->
                 <!-- Rate songs content placeholder -->
@@ -182,16 +204,87 @@
       {{/if}}
     </script>
 
-    <!-- user-content-counter script (show user counter in navigation bar) -->
+    <!-- user-information script (show user information in modal window) -->
+    <script id="user-information-template" type="text/x-handlebars-template">
+      <form>
+        <div class="form-group">
+          <label>Display name</label>
+          <small class="form-text text-muted">
+            {{#if display_name}}
+              <span class="">{{display_name}}</span>
+            {{else}}
+              <span class="">{{id}}</span>
+            {{/if}}
+          </small>
+        </div>
+        <div class="form-group">
+          <label>Date of birth</label>
+          <small class="form-text text-muted">
+            {{#if birthdate}}
+              <span class="">{{birthdate}}</span>
+            {{else}}
+              <span class="">{{birthdate}}</span>
+            {{/if}}
+          </small>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <small class="form-text text-muted">
+            {{#if email}}
+              <span class="">{{email}}</span>
+            {{else}}
+              <span class="">-</span>
+            {{/if}}
+          </small>
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <small class="form-text text-muted">
+            {{#if country}}
+              <span class="">{{country}}</span>
+            {{else}}
+              <span class="">-</span>
+            {{/if}}
+          </small>
+        </div>
+        <div class="form-group">
+          <label>Followers</label>
+          <small class="form-text text-muted">
+            {{#if followers}}
+              <span class="">{{followers.total}}</span>
+            {{/if}}
+          </small>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <small class="form-text text-muted">
+            {{#if type}}
+              <span class="">{{type}}</span>
+            {{/if}}
+          </small>
+        </div>
+        <div class="form-group">
+          <label>URL</label>
+          <small class="form-text text-muted">
+            {{#if external_urls}}
+              <a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a>
+            {{/if}}
+          </small>
+        </div>
+      </form>
+
+    </script>
+
+    <!-- user-content-counter script (show user counter in content) -->
     <script id="user-content-counter-template" type="text/x-handlebars-template">{{rated_elements_count}}</script>
 
-    <!-- user-rate-songs script (show user counter in navigation bar) -->
+    <!-- user-rate-songs script (show user counter in content) -->
     <script id="user-rate-songs-template" type="text/x-handlebars-template">
-      <table class="table table-hover table-striped songs-table" id="">
+      <table class="table table-hover table-striped songs-rate-table">
         <!-- <thead>
           <h3>Saved songs list</h3>
         </thead> -->
-        <tbody>
+        <tbody id="songsRateTable">
           {{#if items}}
             {{#items}}
               <tr>
@@ -269,6 +362,10 @@
       var userNavbarNameSource = document.getElementById('user-navbar-name-template').innerHTML,
           userNavbarNameTemplate = Handlebars.compile(userNavbarNameSource),
           userNavbarNamePlaceholder = document.getElementById('user-navbar-name');
+      // user-information-template
+      var userInformationSource = document.getElementById('user-information-template').innerHTML,
+          userInformationTemplate = Handlebars.compile(userInformationSource),
+          userInformationPlaceholder = document.getElementById('user-information');     
       // user-content-counter-template
       var userContentCounterSource = document.getElementById('user-content-counter-template').innerHTML,
           userContentCounterTemplate = Handlebars.compile(userContentCounterSource),
@@ -316,6 +413,8 @@
               userNavbarIconPlaceholder.innerHTML = userNavbarIconTemplate(response);
               // user-navbar-name placeholder
               userNavbarNamePlaceholder.innerHTML = userNavbarNameTemplate(response);
+              // user-information placeholder
+              userInformationPlaceholder.innerHTML = userInformationTemplate(response);
 
               // Get user information for counter
               $.ajax({
@@ -382,7 +481,19 @@
         console.log($(object).parent().parent().attr('id'));
       }
     </script>
-        
+
+    <!-- Search songs list -->
+    <script>
+      $(document).ready(function(){
+        $("#songsRateTableInput").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $("#songsRateTable tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+      });
+    </script>
+
   </body>
 
 </html>
