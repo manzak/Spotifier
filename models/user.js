@@ -90,3 +90,19 @@ module.exports.getUserById = function(access_token, callback){
         callback
     );
 }
+
+/* 
+* UPDATE user.
+* 
+* Updates user if exist from formatted JSON.
+*
+* return - JSON formatted updated user with all fields.
+*/
+module.exports.updateUser = function(id, user, callback){
+    User.findOneAndUpdate(
+        { user_id: id },
+        { session_id: user.session_id, access_token: user.access_token, refresh_token: user.refresh_token, rated_elements_count: user.rated_elements_count },
+        { new: true },
+        callback
+    );
+}

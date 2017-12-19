@@ -192,15 +192,34 @@ app.get('/logout', function(req, res) {
 * Shows basic API information.
 */
 app.get('/api', function(req, res) {
-  // if (req.cookies) {
-    if (req.session.access_token) {
+  User.findOne({access_token : req.session.access_token}).count(function(error, callback) {
+    if (callback == 1) {
+      console.log("access to api granted.");
       res.status(200).send({status: 200, token: req.session.access_token});
     } else {
+      console.log("access to api denied.");
       res.status(403).send({error: {status: 403, message: "Invalid token. Access denied!"}});
     }
-  // } else {
-  //   res.redirect('/login');
-  // }
+  });
+});
+
+/* 
+* API/access_token.
+* 
+* Shows basic API information when valid access_token was granted.
+*/
+app.get('/api/:access_token', function(req, res) {
+  var token = req.params.access_token;
+  console.log("token" + token);
+  User.findOne({access_token : token}).count(function(error, callback) {
+    if (callback == 1) {
+      console.log("access to api granted.");
+      res.status(200).send({status: 200, token: token});
+    } else {
+      console.log("access to api denied.");
+      res.status(403).send({error: {status: 403, message: "Invalid token. Access denied!"}});
+    }
+  });
 });
 
 /* 
@@ -276,6 +295,65 @@ app.get("/api/users/:_id", function(req, res){
         res.status(200).send(JSON.stringify(user, null, 3));
     }
   })
+});
+
+/* 
+* API/USERS.
+* 
+* Adds an user.
+*/
+app.post("/api/users", function(req, res){
+  var user = req.body;
+  User.addUser(user, req.session.access_token, req.session.refresh_token, req.session.id, function(err, user){
+    res.setHeader("Content-Type", "application/json");
+    if(err){
+        res.status(500).send(JSON.stringify(err, null, 3));
+    } else {
+        res.status(201).send(JSON.stringify(user, null, 3));
+    }
+  })
+});
+
+/* 
+* API/USERS.
+* 
+* Updates an user.
+*/
+app.put("/api/users/:_id", function(req, res){
+  var id = req.params._id;
+  var user = req.body;
+  console.log(id);
+  console.log(user);
+  console.log(req.session.access_token);
+  console.log(req.session.refresh_token);
+  console.log(req.session.id);
+  User.updateUser(id, user, function(err, user){
+    if(err){
+        res.status(500).send(JSON.stringify(err, null, 3));
+    } else if (user == null) {
+        res.status(404).send({error: {status: 404, message: "Not found"}});
+    } else {
+        res.status(204).send();
+    }
+  })
+});
+
+app.put("/api/genres/:_id", function(req, res){
+  var id = req.params._id;
+  var genre = req.body;
+  if(objectID.isValid(id)) {
+      Genre.updateGenre(id, genre, function(err, genre){
+          if(err){
+              res.status(500).send(JSON.stringify(err, null, 3));
+          } else if (genre == null) {
+              res.status(404).send({error: {status: 404, message: "Not found"}});
+          } else {
+              res.status(204).send();
+          }
+      });
+  } else {
+      res.status(400).send({error: {status: 400, message: "Invalid id"}});
+  }
 });
 
 /* 
