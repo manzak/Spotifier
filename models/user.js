@@ -81,7 +81,7 @@ module.exports.deleteUser = function(access_token, callback){
 * 
 * Gets existing user if found from formatted JSON by access_token.
 *
-* return - returns deleted user object
+* return - returns existing user object
 */
 module.exports.getUserById = function(access_token, callback){
     console.log(access_token);

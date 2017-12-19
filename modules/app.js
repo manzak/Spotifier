@@ -72,6 +72,8 @@ var spotifierDatabase = mongoose.connect("mongodb://localhost/spotifier", {
 // Importing models used from models folder
 User = require("../models/user");
 Genre = require("../models/genre");
+Song = require("../models/song");
+SongRate = require("../models/song_rate");
 
 /* 
 * LOGIN app.
@@ -274,6 +276,41 @@ app.get("/api/users/:_id", function(req, res){
         res.status(200).send(JSON.stringify(user, null, 3));
     }
   })
+});
+
+/* 
+* RATING
+* 
+* ...
+*/
+app.get("/api/songs/ratings", function(req, res){
+  // console.log(SongRate.find().count(function(error, nbDocs) {
+  //   // Do what you need the count for here.
+  //   console.log(nbDocs);
+  //   if (nbDocs > 0) {
+  //     console.log("Daugiau.");
+  //   } else {
+  //     console.log("Maziau.");
+  //   }
+    
+  // }));
+
+  var ratedBefore = SongRate.find({user_id : 'pirmas', song_id : 'pirma'}).count(function(error, callback) {
+    console.log(callback);
+  });
+    // Do what you need the count for here.
+  // var ratedBefore = SongRate.find({user_id : 'pirmas', song_id : 'pirma'}, function(err, document) {
+  //   console.log(document.name);
+  // });
+  // console.log(ratedBefore);
+  // if (ratedBefore > 0) {
+  //   console.log("Daugiau.");
+  // } else {
+  //   console.log("Maziau.");
+  // }
+
+  // res.redirect('/');
+  // console.log(ratedBefore);
 });
 
 // Listens to 8888 port on local server
