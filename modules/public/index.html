@@ -24,65 +24,125 @@
     <div id="wrap">
       <!-- Navigation -->
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-          <a class="navbar-brand" href="#">Spotifier</a>
+        <div class="container ">
+          <h6 class="navbar-brand" style="margin: 0; padding: 0">Spotifier<img width="32" height="32" src="images/spotifier-icon.ico" alt="Spotifier icon"></h6>
           <!-- Only logged in user sees navigation menu -->
           <div class="loggedin">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" style="margin: 0; padding: 0; border: 0">
               <!-- NOT USED - DEFAULT ICON FOR MENU BUTTON -->
               <!-- <span class="navbar-toggler-icon"></span> -->
-              <div class="loggedin">
-                  <div id="user-navbar-icon">
-                  </div>
-              </div>
+              <!-- <div class="loggedin"> -->
+                  <div id="user-navbar-icon"></div>
+              <!-- </div> -->
             </button>
+
+
             <div class="collapse navbar-collapse" id="navbarResponsive">
               <ul class="navbar-nav ml-auto">
-                  <!-- user-navbar-name script data placeholder -->
-                  <div class="loggedin">
-                      <div id="user-navbar-name">
-                      </div>
-                  </div>
-                <li class="nav-item active">
+                <!-- user-navbar-name script data placeholder -->
+                <li class="nav-item navbar-text" id="user-navbar-name"></li>
+                <!-- <li class="nav-item">
                   <a class="nav-link" href="#">HOME
                     <span class="sr-only">(current)</span>
                   </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
-                  <!-- OLD REDIRECT TO SPOTIFY LOGOUT METHOD -->
-                  <!-- <a class="nav-link" href="#" id="logout">LOG OUT</a> -->
-                  <a class="nav-link" href="/logout">LOG OUT</a> -->
+                  <a class="nav-link" href="/logout">LOG OUT</a>
                 </li>
               </ul>
             </div>
+
+
           </div>
         </div>
       </nav>
       <!-- /.navigation -->
 
       <!-- Page Content -->
-      <div class="container">
+      <div class="container wrapper">
         <!-- Jumbotron Header -->
         <header class="jumbotron my-4">
           <div class="container">
-            <!-- Login page -->
+            <!-- Login (home) page -->
             <div class="login" id="welcome_message">
               <h1 class="display-3">Welcome to Spotifier!</h1>
               <p class="lead">Get the right music, right now. Listen to millions of songs and rate them all!</p>
-              <a href="/login" class="btn btn-primary btn-lg">LOG IN WITH SPOTIFY</a>
+              <a href="/login" class="btn btn-success btn-lg">LOG IN WITH SPOTIFY</a>
             </div>
             <!-- Logged in user page -->
-            <div class="loggedin">            
-              <!-- Logged in place holder -->
-              <h1 class="display-3">Welcome user to our Web Application!</h1>
+            <div class="loggedin">
+              <h1 class="display-4">Welcome user to our Web Application!</h1>
               <p class="lead">Spotifier let's you use those cool functions!</p>
-              <a href="#" class="btn btn-success btn-lg" id="rate-songs">Rate saved songs <!-- Counter placeholder --><span id="user-content-counter"></span></a>
-              <button href="/api/followers" class="btn btn-lg btn-warning" disabled>Rate followed artists</button>
-              <button href="/api/playlists" class="btn btn-lg btn-warning" disabled>Get playlists</button>
-              <a href="" class="btn btn-lg btn-danger" id="delete-user">DELETE USER</a>
-              <div class="rate-songs-content" style="display: none;">
-                <div id="user-rate-songs"></div>
-              </div>
+                <div id="accordion" role="tablist">
+                  <div class="card">
+                    <button class="btn btn-lg btn-success text-left" role="tab" id="rate-songs" data-toggle="collapse" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                      <!-- <h5 class="mb-0"> -->
+                        <span>
+                          <!-- Counter placeholder -->
+                          Saved songs list (rated songs: <span id="user-content-counter"></span>)
+                        </span>
+                      <!-- </h5> -->
+                    </button>
+                    <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="rate-songs" data-parent="#accordion">
+                      <div class="card-body">
+                        <!-- Rate songs content placeholder -->
+                        <div id="user-rate-songs"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <button class="btn btn-lg btn-warning text-left" role="tab" id="rate-artists" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      <!-- <h5 class="mb-0"> -->
+                        <span>
+                          <!-- Counter placeholder -->
+                          Saved artists list (rated artists: <span id="user-content-counter"></span>)
+                        </span>
+                      <!-- </h5> -->
+                    </button>
+                    <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="rate-songs" data-parent="#accordion">
+                      <div class="card-body">
+                        <!-- Rate artists content placeholder -->
+                        <div id="user-rate-artists"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <button class="btn btn-lg btn-warning text-left" role="tab" id="rankings-songs" data-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                      <!-- <h5 class="mb-0"> -->
+                        <span>Songs rankings</span>
+                      <!-- </h5> -->
+                    </button>
+                    <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="rate-songs" data-parent="#accordion">
+                      <div class="card-body">
+                        <!-- Songs rankings content placeholder -->
+                        <div id="user-songs-rankings"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <button class="btn btn-lg btn-warning text-left" role="tab" id="rankings-artists" data-toggle="collapse" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                      <!-- <h5 class="mb-0"> -->
+                        <span>Artists rankings</span>
+                      <!-- </h5> -->
+                    </button>
+                    <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="rate-songs" data-parent="#accordion">
+                      <div class="card-body">
+                        <!-- Artists rankings content placeholder -->
+                        <div id="user-artists-rankings"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- <button href="#" type="button" class="btn btn-md btn-success" id="rate-songs">Rate buttton OLD</button> -->
+                <!-- <button href="/api/followers" type="button" class="btn btn-md btn-warning" disabled>Rate followed artists</button>
+                <button href="/api/playlists" class="btn btn-md btn-warning" disabled>Songs rankings</button>
+                <button href="/api/songs" class="btn btn-md btn-warning" disabled>Followers rankings</button> -->
+                <button href="" class="btn btn-md btn-danger" id="delete-user">DELETE USER</button>
+                <!-- Toogleable Rate songs button placeholder -->
+                <!-- <div class="rate-songs-content" style="display: none;"> -->
+                <!-- Rate songs content placeholder -->
+                <!-- <div id="user-rate-songs"></div> -->
+                <!-- </div> -->
             </div>
           </div>
         </header>
@@ -103,69 +163,96 @@
 
     <!-- user-navbar-icon script (show user icon in navigation bar) -->
     <script id="user-navbar-icon-template" type="text/x-handlebars-template">
-      <div class="loggedin">
-        <div>
-          {{#if images}}
-            <img class="media-object" width="48" height="48" src="{{images.0.url}}" />
-          {{else}}
-            <svg width="48" height="48" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
-              <title>User Icon</title>
-              <path d="M67.74 61.78l-14.5-8.334c-.735-.422-1.24-1.145-1.385-1.98-.145-.835.088-1.685.638-2.33l5.912-6.93c3.747-4.378 5.81-9.967 5.81-15.737v-2.256c0-6.668-2.792-13.108-7.658-17.67C51.622 1.92 45.17-.386 38.392.054c-12.677.82-22.607 11.772-22.607 24.934v1.483c0 5.77 2.063 11.36 5.81 15.736l5.912 6.933c.55.644.783 1.493.638 2.33-.143.834-.648 1.556-1.383 1.98l-14.494 8.33C4.7 66.077 0 74.15 0 82.844v6.76h3.333v-6.76c0-7.5 4.055-14.46 10.59-18.174l14.5-8.334c1.597-.918 2.692-2.487 3.007-4.302.315-1.815-.19-3.66-1.387-5.06l-5.913-6.936c-3.23-3.775-5.01-8.594-5.01-13.57v-1.484c0-11.41 8.562-20.9 19.488-21.608 5.85-.377 11.415 1.61 15.67 5.598 4.26 3.992 6.605 9.404 6.605 15.24v2.254c0 4.976-1.778 9.796-5.01 13.57l-5.915 6.935c-1.195 1.4-1.7 3.246-1.386 5.06.313 1.816 1.41 3.385 3.008 4.303l14.507 8.338c6.525 3.71 10.58 10.67 10.58 18.17v6.76H80v-6.76c0-8.695-4.7-16.768-12.26-21.063z" fill="currentColor" fill-rule="evenodd"></path>
-            </svg>
-          {{/if}}
-        </div>
-      </div>
+      {{#if images}}
+        <img class="media-object" width="48" height="48" src="{{images.0.url}}" />
+      {{else}}
+        <svg width="48" height="48" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+          <title>User icon</title>
+          <path d="M67.74 61.78l-14.5-8.334c-.735-.422-1.24-1.145-1.385-1.98-.145-.835.088-1.685.638-2.33l5.912-6.93c3.747-4.378 5.81-9.967 5.81-15.737v-2.256c0-6.668-2.792-13.108-7.658-17.67C51.622 1.92 45.17-.386 38.392.054c-12.677.82-22.607 11.772-22.607 24.934v1.483c0 5.77 2.063 11.36 5.81 15.736l5.912 6.933c.55.644.783 1.493.638 2.33-.143.834-.648 1.556-1.383 1.98l-14.494 8.33C4.7 66.077 0 74.15 0 82.844v6.76h3.333v-6.76c0-7.5 4.055-14.46 10.59-18.174l14.5-8.334c1.597-.918 2.692-2.487 3.007-4.302.315-1.815-.19-3.66-1.387-5.06l-5.913-6.936c-3.23-3.775-5.01-8.594-5.01-13.57v-1.484c0-11.41 8.562-20.9 19.488-21.608 5.85-.377 11.415 1.61 15.67 5.598 4.26 3.992 6.605 9.404 6.605 15.24v2.254c0 4.976-1.778 9.796-5.01 13.57l-5.915 6.935c-1.195 1.4-1.7 3.246-1.386 5.06.313 1.816 1.41 3.385 3.008 4.303l14.507 8.338c6.525 3.71 10.58 10.67 10.58 18.17v6.76H80v-6.76c0-8.695-4.7-16.768-12.26-21.063z" fill="currentColor" fill-rule="evenodd"></path>
+        </svg>
+      {{/if}}
     </script>
 
     <!-- user-navbar-name script (show user name in navigation bar) -->
     <script id="user-navbar-name-template" type="text/x-handlebars-template">
-      <div class="loggedin">
-        <div>
-          <li class="nav-item">
-              {{#if display_name}}
-                <span class="navbar-text">{{display_name}}</span>
-              {{else}}
-                <span class="navbar-text">{{id}}</span>
-              {{/if}}
-          </li>
-        </div>
-      </div>
+      {{#if display_name}}
+        <span class="text-success">{{display_name}}</span>
+      {{else}}
+        <span class="text-success">{{id}}</span>
+      {{/if}}
     </script>
 
     <!-- user-content-counter script (show user counter in navigation bar) -->
-    <script id="user-content-counter-template" type="text/x-handlebars-template">({{rated_elements_count}})</script>
+    <script id="user-content-counter-template" type="text/x-handlebars-template">{{rated_elements_count}}</script>
 
     <!-- user-rate-songs script (show user counter in navigation bar) -->
     <script id="user-rate-songs-template" type="text/x-handlebars-template">
       <table class="table table-hover table-striped songs-table" id="">
-        <thead>
-          <h3>Saved songs list</g3>
-        </thead>
+        <!-- <thead>
+          <h3>Saved songs list</h3>
+        </thead> -->
         <tbody>
           {{#if items}}
             {{#items}}
               <tr>
                 <td><img width="64" height="64" src="{{track.album.images.2.url}}"/></td>
-                <td>{{track.name}}
+                <td><a href="{{track.external_urls.spotify}}">{{track.name}}
                   <span> - </span>
                   <span>
                     {{#track.artists}}
                       {{name}}
                     {{/track.artists}}
                 </span>
+                </a><br />
+                  <audio controls controlsList="nodownload">
+                    <source src="{{track.preview_url}}" type="audio/mp3">
+                      Your browser does not support the audio element.
+                  </audio>
                 </td>
                 <td class="star-rating">
-                  <span class="badge btn-danger badge-default badge-pill" data-rating="1">1</span>
+                  <!-- <span class="badge btn-danger badge-default badge-pill" data-rating="1">1</span>
                   <span class="badge btn-danger badge-default badge-pill" data-rating="2">2</span>
                   <span class="badge btn-warning badge-default badge-pill" data-rating="3">3</span>
                   <span class="badge btn-success badge-default badge-pill" data-rating="4">4</span>
-                  <span class="badge btn-success badge-default badge-pill" data-rating="5">5</span>
+                  <span class="badge btn-success badge-default badge-pill" data-rating="5">5</span> -->
+                  <form class="rating" id="song-{{track.id}}">
+                    <label>
+                      <input type="radio" onclick="star(this)" name="stars" value="1" />
+                      <span class="icon">★</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="2" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="3" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>   
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="4" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="5" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                    </label>
+                  </form>
                 </td>
               </tr>
             {{/items}}
           {{else}}
             <span>
-                You haven't saved any song yet. Go ahead and make your playlist!
+                You haven't saved any song yet. Go ahead and make your songs list!
             </span>
           {{/if}}
         </tbody>
@@ -268,10 +355,9 @@
               success: function(response) {
                 // user-rate-songs placeholder
                 userRateSongsPlaceholder.innerHTML = userRateSongsTemplate(response);
-                // location.href = "/logout"
                 console.log(response);
 
-                $('.rate-songs-content').toggle();
+                // $('.rate-songs-content').toggle();
               }
             });
           }, false);
@@ -281,31 +367,22 @@
             $('.login').show();
             $('.loggedin').hide();
         }
-
-
-        // Start rating function
-        var $star_rating = $('.star-rating .fa');
-
-        var SetRatingStar = function() {
-          return $star_rating.each(function() {
-            if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
-              return $(this).removeClass('fa-star-o').addClass('fa-star');
-            } else {
-              return $(this).removeClass('fa-star').addClass('fa-star-o');
-            }
-          });
-        };
-
-        $star_rating.on('click', function() {
-          $star_rating.siblings('input.rating-value').val($(this).data('rating'));
-          return SetRatingStar();
-        });
-
-        SetRatingStar();
-
-
+        // Other functions
       })();
     </script>
+
+    <!-- Star rating script -->
+    <script>
+      $(':radio').change(function() {
+        console.log('New star rating: ' + this.value);
+      });
+
+      function star(object) {
+        console.log(object.value);
+        console.log($(object).parent().parent().attr('id'));
+      }
+    </script>
+        
   </body>
 
 </html>
