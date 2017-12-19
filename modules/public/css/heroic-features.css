@@ -139,4 +139,7 @@ table.songs-rate-table tbody tr td:last-child{width: 15%}
     line-height: 16px;
     font-size: 16px;
   }
+  audio {
+    display: none;
+  }
 }
