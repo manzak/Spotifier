@@ -192,8 +192,8 @@ app.get('/logout', function(req, res) {
 * Shows basic API information.
 */
 app.get('/api', function(req, res) {
-  User.findOne({access_token : req.session.access_token}).count(function(error, callback) {
-    if (callback == 1) {
+  User.findOne({access_token : req.session.access_token}, function(error, callback) {
+    if (callback.access_token == req.session.access_token) {
       console.log("access to api granted.");
       res.status(200).send({status: 200, token: req.session.access_token});
     } else {
